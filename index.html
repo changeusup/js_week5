@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+	<style type="text/css">
+		{
+			padding: 0;
+			margin: 0;
+			font-family: sans-serif;
+			box-sizing: border-box;
+		}
+		body {display: grid; height: 100vh; place-items:  center;}
+		#container {
+			height: 400px; width: 1200px; position: relative; overflow: hidden;}
+		#container #dino {height: 70px; width: 70px; position: absolute; bottom: 28px; left: 20px; }
+		#container #dino img {height: 70px; width: 70px;}
+		.dinoActive {animation: animateDino 0.5s linear infinite;}
+		@keyframes animateDino{
+			0%,100%
+			{
+				bottom: 28px;
+			}
+			45%,55%
+			{
+				bottom: 160px;
+			}
+		}
+		#container #block {height: 80px; width: 125px; position: absolute; bottom: 20px; right: -20px; }
+		#container #block img {height: 80px; width: 125px;}
+		.blockActive {animation: blockAnimate 1s linear infinite;}
+		@keyframes blockAnimate {
+			0%
+			{
+				right: -125px;
+			}
+			100%
+			{
+				right: 100%;
+			}
+		}
+		#container #road {height: 30px; width: 1200px; position: absolute; bottom: 0;}
+		#container #road img {height: 30px; width: 2000px; position: absolute; left: 0; animation: none;}
+		@keyframes roadAnimate{
+			0%
+			{
+				left: 0;
+			}
+			100%{
+				left: -800px;
+			}
+		}
+		#container #cloud {height: 80px; width: 1200px; border-radius: 40px; position: absolute; top: 30px;}
+		#container #cloud img {height: 80px; width: 2000px; position: absolute; left: -2000px; animation: none;}
+		@keyframes cloudAnimate {
+			0%
+			{
+				left: -2000px;
+			}
+			100% 
+			{
+				left: 100%;
+			}
+		}
+		#score {height: auto; width: auto; position: absolute; top: 20px; right: 0;}
+		#gameOver {display: none; font-size: 70px; position: absolute; left: calc(50% - 181px); top: calc(50% - 40px); width: 362px; height: 80px; color: black;}
+	</style>
+</head>
+<body>
+	<div id="container">
+		<div id="dino">
+			<img src="dino.png" alt="dino">
+		</div>
+		<div id="block">
+			<img src="block.png" alt="block">
+		</div>
+		<div id="road">
+			<img src="road.png" alt="road">
+		</div>
+		<div id="cloud">
+			<img src="cloud.jpg" alt="cloud">
+		</div>
+		<div id="score">Score <b>00</b></div>
+		<div id="gameOver">Game Over</div>
+	</div>
+	<script type="text/javascript">
+		let container = document.querySelector("#container");
+		let dino = document.querySelector("#dino");
+		let block = document.querySelector("#block");
+		let road = document.querySelector("#road");
+		let cloud = document.querySelector("#cloud");
+		let score = document.querySelector("#score");
+		let gameOver = document.querySelector("#gameOver");
+
+		//스코어 variable
+		let interval = null;
+		let playerScore = 0;
+
+		//스코어 function
+		let scoreCounter = ()=>{
+			playerScore++;
+			score.innerHTML = `Score <b>${playerScore}</b>`;
+		}
+
+		//게임 스타트
+		//interval = setInterval(scoreCounter,200)
+		window.addEventListener("keydown" , (start)=>{
+			//console.log(start);
+			if(start.code == "Space")
+			{
+				gameOver.style.display = "none";
+				block.classList.add("blockActive");
+				road.firstElementChild.style.animation = "roadAnimate 1.5s linear infinite";
+				cloud.firstElementChild.style.animation = "cloudAnimate 50s linear infinite";
+
+				//스코어
+				let playerScore = 0;
+				interval = setInterval(scoreCounter,200);
+			}
+		});
+
+		//캐릭터 점프
+		window.addEventListener("keydown" , (e)=>{
+			if(e.key == "ArrowUp")
+				if(dino.classList != "dinoActive")
+				{
+					dino.classList.add("dinoActive");
+
+					//클레스 제거
+					setTimeout(()=>{
+						dino.classList.remove("dinoActive");
+					},500);
+				}
+		});
+
+		//게임 오버
+		let result = setInterval(()=>{
+			let dinoBottom = parseInt(getComputedStyle(dino).getPropertyValue("bottom"));
+
+			let blockLeft = parseInt(getComputedStyle(block).getPropertyValue("left"));
+
+			if(dinoBottom <= 90 && blockLeft >= 20 && blockLeft <= 145){
+				
+				gameOver.style.display ="block";
+				block.classList.remove("blockActive");
+				road.firstElementChild.style.animation = "none";
+				cloud.firstElementChild.style.animation = "none";
+				clearInterval(interval);
+				playerScore = 0;
+			}
+		},10);
+	</script>
+</body>
+</html>
